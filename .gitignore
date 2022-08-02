@@ -7,3 +7,9 @@ typechain
 #Hardhat files
 cache
 artifacts
+.eslintignore
+.eslintrc.js
+!.npmignore
+!.prettierignore
+!.prettierrc
+!.solhint.json
