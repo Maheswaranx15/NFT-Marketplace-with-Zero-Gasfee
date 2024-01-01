@@ -45,7 +45,7 @@ contract OwnUser721Token is
     ) ERC721(name, symbol) {
         baseTokenURI = _baseTokenURI;
         owner = _msgSender();
-        _setupRole(ADMIN_ROLE, msg.sender);
+        _grantRole(ADMIN_ROLE, msg.sender);
         _tokenIdTracker.increment();
     }
 
@@ -65,7 +65,7 @@ contract OwnUser721Token is
         );
         _revokeRole(ADMIN_ROLE, owner);
         owner = newOwner;
-        _setupRole(ADMIN_ROLE, newOwner);
+        _grantRole(ADMIN_ROLE, newOwner);
         emit OwnershipTransferred(owner, newOwner);
         return true;
     }

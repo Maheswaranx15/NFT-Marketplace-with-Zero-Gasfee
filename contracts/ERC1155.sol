@@ -56,8 +56,8 @@ contract Lazy_ERC1155 is
         baseTokenURI = _baseTokenURI;
         owner = _msgSender();
         operator = _operator;
-        _setupRole(ADMIN_ROLE, msg.sender);
-        _setupRole(OPERATOR_ROLE, operator);
+        _grantRole(ADMIN_ROLE, msg.sender);
+        _grantRole(OPERATOR_ROLE, operator);
         _name = _tokenName;
         _symbol = _tokenSymbol;
         _tokenIdTracker.increment();
@@ -85,7 +85,7 @@ contract Lazy_ERC1155 is
         );
         _revokeRole(ADMIN_ROLE, owner);
         owner = newOwner;
-        _setupRole(ADMIN_ROLE, newOwner);
+        _grantRole(ADMIN_ROLE, newOwner);
         emit OwnershipTransferred(owner, newOwner);
         return true;
     }

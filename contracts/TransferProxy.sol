@@ -20,8 +20,8 @@ contract TransferProxy is AccessControl, ITransferProxy {
 
     constructor() {
         owner = msg.sender;
-        _setupRole(ADMIN_ROLE, msg.sender);
-        _setupRole(OPERATOR_ROLE, operator);
+        _grantRole(ADMIN_ROLE, msg.sender);
+        _grantRole(OPERATOR_ROLE, operator);
     }
 
     function changeOperator(address _operator)
@@ -35,7 +35,7 @@ contract TransferProxy is AccessControl, ITransferProxy {
         );
         _revokeRole(ADMIN_ROLE, operator);
         operator = _operator;
-        _setupRole(OPERATOR_ROLE, operator);
+        _grantRole(OPERATOR_ROLE, operator);
         emit operatorChanged(address(0), operator);
         return true;
     }
@@ -54,7 +54,7 @@ contract TransferProxy is AccessControl, ITransferProxy {
         );
         _revokeRole(ADMIN_ROLE, owner);
         owner = newOwner;
-        _setupRole(ADMIN_ROLE, newOwner);
+        _grantRole(ADMIN_ROLE, newOwner);
         emit OwnershipTransferred(owner, newOwner);
         return true;
     }

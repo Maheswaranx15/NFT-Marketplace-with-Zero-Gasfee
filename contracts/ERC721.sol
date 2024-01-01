@@ -51,8 +51,8 @@ contract Lazy_ERC721 is
         baseTokenURI = _baseTokenURI;
         owner = _msgSender();
         operator = _operator;
-        _setupRole(ADMIN_ROLE, msg.sender);
-        _setupRole(OPERATOR_ROLE, operator);
+        _grantRole(ADMIN_ROLE, msg.sender);
+        _grantRole(OPERATOR_ROLE, operator);
         _tokenIdTracker.increment();
     }
 
@@ -67,7 +67,7 @@ contract Lazy_ERC721 is
         );
         _revokeRole(ADMIN_ROLE, owner);
         owner = newOwner;
-        _setupRole(ADMIN_ROLE, newOwner);
+        _grantRole(ADMIN_ROLE, newOwner);
         emit OwnershipTransferred(owner, newOwner);
         return true;
     }
@@ -76,7 +76,7 @@ contract Lazy_ERC721 is
         return _baseURI();
     }
 
-    function setBaseURI(string memory _baseTokenURI) external onlyOwner {
+    function setBaseURI(string memory _baseTokenURI) external onlyRole(ADMIN_ROLE) {
         baseTokenURI = _baseTokenURI;
     }
 

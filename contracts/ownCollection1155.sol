@@ -50,7 +50,7 @@ contract OwnUser1155Token is
     ) ERC1155(_baseTokenURI) {
         baseTokenURI = _baseTokenURI;
         owner = _msgSender();
-        _setupRole(ADMIN_ROLE, msg.sender);
+        _grantRole(ADMIN_ROLE, msg.sender);
         _name = _tokenName;
         _symbol = _tokenSymbol;
         _tokenIdTracker.increment();
@@ -83,7 +83,7 @@ contract OwnUser1155Token is
         );
         _revokeRole(ADMIN_ROLE, owner);
         owner = newOwner;
-        _setupRole(ADMIN_ROLE, newOwner);
+        _grantRole(ADMIN_ROLE, newOwner);
         emit OwnershipTransferred(owner, newOwner);
         return true;
     }

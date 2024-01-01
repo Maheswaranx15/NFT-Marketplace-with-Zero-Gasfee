@@ -105,7 +105,7 @@ contract Trade is AccessControl {
         transferProxy = _transferProxy;
         owner = msg.sender;
         signer = msg.sender;
-        _setupRole(ADMIN_ROLE, msg.sender);
+        _grantRole(ADMIN_ROLE, msg.sender);
     }
 
     /**
@@ -168,7 +168,7 @@ contract Trade is AccessControl {
         );
         _revokeRole(ADMIN_ROLE, owner);
         owner = newOwner;
-        _setupRole(ADMIN_ROLE, newOwner);
+        _grantRole(ADMIN_ROLE, newOwner);
         emit OwnershipTransferred(owner, newOwner);
         return true;
     }
