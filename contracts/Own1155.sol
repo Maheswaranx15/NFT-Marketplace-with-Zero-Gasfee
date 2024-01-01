@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.14;
+// SPDX-License-Identifier: MIT
+pragma solidity 0.8.21;
 
 
 import "./ownCollection1155.sol";
