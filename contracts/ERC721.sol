@@ -1,32 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.21;
-
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "./common/ERC2981.sol";
 
-contract Lazy_ERC721 is
-    Context,
+contract LazyMinting_721 is
     ERC721Enumerable,
     ERC721Burnable,
     ERC721URIStorage,
+    ERC721Pausable,
     ERC2981,
-    AccessControl
+    Ownable
 {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIdTracker;
     string private baseTokenURI;
-    address public owner;
+    address public _owner;
     mapping(uint256 => bool) private usedNonce;
-    address public operator;
-
-    // Create a new role identifier for the minter role
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-    bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
 
     struct Sign {
         uint8 v;
@@ -35,48 +27,20 @@ contract Lazy_ERC721 is
         uint256 nonce;
     }
 
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
-    event Pack(uint256[] tokenIds);
-    event RemovedFromPack(uint256[] tokenIds);
-
     constructor(
         string memory name,
         string memory symbol,
-        string memory _baseTokenURI,
-        address _operator
-    ) ERC721(name, symbol) {
+        string memory _baseTokenURI
+    ) ERC721(name, symbol)Ownable(msg.sender) {
         baseTokenURI = _baseTokenURI;
-        owner = _msgSender();
-        operator = _operator;
-        _grantRole(ADMIN_ROLE, msg.sender);
-        _grantRole(OPERATOR_ROLE, operator);
-        _tokenIdTracker.increment();
-    }
-
-    function transferOwnership(address newOwner)
-        external
-        onlyRole(ADMIN_ROLE)
-        returns (bool)
-    {
-        require(
-            newOwner != address(0),
-            "Ownable: new owner is the zero address"
-        );
-        _revokeRole(ADMIN_ROLE, owner);
-        owner = newOwner;
-        _grantRole(ADMIN_ROLE, newOwner);
-        emit OwnershipTransferred(owner, newOwner);
-        return true;
+        _owner = _msgSender();
     }
 
     function baseURI() external view returns (string memory) {
         return _baseURI();
     }
 
-    function setBaseURI(string memory _baseTokenURI) external onlyRole(ADMIN_ROLE) {
+    function setBaseURI(string memory _baseTokenURI) external onlyOwner {
         baseTokenURI = _baseTokenURI;
     }
 
@@ -84,17 +48,16 @@ contract Lazy_ERC721 is
         string memory _tokenURI,
         uint96 _royaltyFee,
         Sign calldata sign
-    ) external virtual returns (uint256 _tokenId) {
+    ) external virtual returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
         require(!usedNonce[sign.nonce], "Nonce : Invalid Nonce");
         usedNonce[sign.nonce] = true;
         verifySign(_tokenURI, msg.sender, sign);
-        _tokenId = _tokenIdTracker.current();
+        uint256 _tokenId = totalSupply();
         _mint(_msgSender(), _tokenId);
         _setTokenURI(_tokenId, _tokenURI);
         _setTokenRoyalty(_tokenId, _msgSender(), _royaltyFee);
-        _tokenIdTracker.increment();
         return _tokenId;
     }
 
@@ -103,26 +66,18 @@ contract Lazy_ERC721 is
         address to,
         string memory _tokenURI,
         uint96 _royaltyFee
-    ) external virtual onlyRole(OPERATOR_ROLE) returns(uint256 _tokenId) {
-        if(!isApprovedForAll(from, operator)) {
-            _setApprovalForAll(from, operator, true);
+    ) external virtual onlyOwner returns(uint256 _tokenId) {
+        if(!isApprovedForAll(from, _owner)) {
+            _setApprovalForAll(from, _owner, true);
         }
-        _tokenId = _tokenIdTracker.current();
+        _tokenId = totalSupply();
         _mint(from, _tokenId);
         _setTokenURI(_tokenId, _tokenURI);
         _setTokenRoyalty(_tokenId, from, _royaltyFee);
         safeTransferFrom(from, to, _tokenId, "");
-        _tokenIdTracker.increment();
         return _tokenId;  
     }
 
-    function _burn(uint256 tokenId)
-        internal
-        override(ERC721, ERC721URIStorage)
-    {
-        _resetTokenRoyalty(tokenId);
-        super._burn(tokenId);
-    }
 
     function tokenURI(uint256 tokenId)
         public
@@ -137,26 +92,33 @@ contract Lazy_ERC721 is
         return baseTokenURI;
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual override(ERC721, ERC721Enumerable) {
-        super._beforeTokenTransfer(from, to, tokenId);
+    function _increaseBalance(address account, uint128 value)
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
+        super._increaseBalance(account, value);
+    }
+
+    function _update(address to, uint256 tokenId, address auth)
+        internal
+        override(ERC721, ERC721Enumerable, ERC721Pausable)
+        returns (address)
+    {
+        return super._update(to, tokenId, auth);
     }
 
     /**
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC721, ERC721Enumerable, ERC2981, AccessControl)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
+            public
+            view
+            override(ERC721, ERC721Enumerable, ERC721URIStorage,ERC2981)
+            returns (bool)
+        {
+            return super.supportsInterface(interfaceId);
     }
+
 
     function verifySign(
         string memory _tokenURI,
@@ -167,7 +129,7 @@ contract Lazy_ERC721 is
             abi.encodePacked(this, caller, _tokenURI, sign.nonce)
         );
         require(
-            owner ==
+            _owner ==
                 ecrecover(
                     keccak256(
                         abi.encodePacked(
