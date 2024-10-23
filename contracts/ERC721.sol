@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "./common/ERC2981.sol";
 
-contract Lazy_ERC721 is
+contract LazyMinting_721 is
     ERC721Enumerable,
     ERC721Burnable,
     ERC721URIStorage,
