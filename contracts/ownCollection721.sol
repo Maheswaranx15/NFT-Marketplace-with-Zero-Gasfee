@@ -1,103 +1,49 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.21;
 
-
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./common/ERC2981.sol";
 
-contract OwnUser721Token is
-    Context,
+contract sample is
+    ERC721,
     ERC721Enumerable,
     ERC721Burnable,
     ERC721URIStorage,
     ERC2981,
-    AccessControl
+    Ownable
 {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIdTracker;
     string private baseTokenURI;
-    address public owner;
-
-    // Create a new role identifier for the minter role
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-
-    struct Sign {
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-        uint256 nonce;
-    }
-
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
 
     constructor(
         string memory name,
         string memory symbol,
         string memory _baseTokenURI
-    ) ERC721(name, symbol) {
+    ) ERC721(name, symbol)Ownable(msg.sender) {
         baseTokenURI = _baseTokenURI;
-        owner = _msgSender();
-        _grantRole(ADMIN_ROLE, msg.sender);
-        _tokenIdTracker.increment();
-    }
-
-    modifier onlyOwner() {
-        require(owner == msg.sender, "Ownable: caller is not the owner");
-        _;
-    }
-
-    function transferOwnership(address newOwner)
-        external
-        onlyRole(ADMIN_ROLE)
-        returns (bool)
-    {
-        require(
-            newOwner != address(0),
-            "Ownable: new owner is the zero address"
-        );
-        _revokeRole(ADMIN_ROLE, owner);
-        owner = newOwner;
-        _grantRole(ADMIN_ROLE, newOwner);
-        emit OwnershipTransferred(owner, newOwner);
-        return true;
     }
 
     function baseURI() external view returns (string memory) {
         return _baseURI();
     }
 
-    function setBaseURI(string memory _baseTokenURI) external onlyRole(ADMIN_ROLE) {
+    function setBaseURI(string memory _baseTokenURI) external onlyOwner {
         baseTokenURI = _baseTokenURI;
     }
 
     function mint(
         string memory _tokenURI,
         uint96 _royaltyFee
-    ) external virtual onlyRole(ADMIN_ROLE) returns (uint256 _tokenId) {
-        // We cannot just use balanceOf to create the new tokenId because tokens
-        // can be burned (destroyed), so we need a separate counter.
-        _tokenId = _tokenIdTracker.current();
-        _mint(_msgSender(), _tokenId);
-        _setTokenURI(_tokenId, _tokenURI);
-        _setTokenRoyalty(_tokenId, _msgSender(), _royaltyFee);
-        _tokenIdTracker.increment();
-        return _tokenId;
-    }
-
-    function _burn(uint256 tokenId)
-        internal
-        override(ERC721, ERC721URIStorage)
-    {
-        _resetTokenRoyalty(tokenId);
-        super._burn(tokenId);
+    ) external onlyOwner returns (uint256) {
+        uint256 tokenId = totalSupply();
+        _mint(_msgSender(), tokenId);
+        _setTokenURI(tokenId, _tokenURI);
+        _setTokenRoyalty(tokenId, _msgSender(), _royaltyFee);
+        return tokenId;
     }
 
     function tokenURI(uint256 tokenId)
@@ -113,24 +59,30 @@ contract OwnUser721Token is
         return baseTokenURI;
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal virtual override(ERC721, ERC721Enumerable) {
-        super._beforeTokenTransfer(from, to, tokenId);
+     function _increaseBalance(address account, uint128 value)
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
+        super._increaseBalance(account, value);
+    }
+
+    function _update(address to, uint256 tokenId, address auth)
+        internal
+        override(ERC721, ERC721Enumerable)
+        returns (address)
+    {
+        return super._update(to, tokenId, auth);
     }
 
     /**
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC721, ERC721Enumerable, ERC2981, AccessControl)
-        returns (bool)
-    {
-        return super.supportsInterface(interfaceId);
+            public
+            view
+            override(ERC721, ERC721Enumerable, ERC721URIStorage,ERC2981)
+            returns (bool)
+        {
+            return super.supportsInterface(interfaceId);
     }
 }
