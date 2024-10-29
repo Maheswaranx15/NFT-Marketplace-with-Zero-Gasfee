@@ -1,65 +1,42 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.21;
+pragma solidity 0.8.23;
 
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
-import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 import "./common/ERC2981.sol";
 
 contract OwnUser1155Token is
-    Context,
+    ERC1155,
     ERC1155Burnable,
     ERC1155Supply,
     ERC2981,
-    AccessControl
+    Ownable
 {
     using Counters for Counters.Counter;
-    using Strings for uint256;
     Counters.Counter private _tokenIdTracker;
     mapping(uint256 => string) private _tokenURIs;
-
-    // Create a new role identifier for the minter role
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-
-
-    struct Sign {
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-        uint256 nonce;
-    }
 
     string private baseTokenURI;
     string private _name;
     string private _symbol;
-    address public owner;
 
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
     event BaseURIChanged(string indexed uri, string indexed newuri);
 
     constructor(
         string memory _tokenName,
         string memory _tokenSymbol,
         string memory _baseTokenURI
-    ) ERC1155(_baseTokenURI) {
+    ) ERC1155(_baseTokenURI)Ownable(msg.sender) {
         baseTokenURI = _baseTokenURI;
-        owner = _msgSender();
-        _grantRole(ADMIN_ROLE, msg.sender);
         _name = _tokenName;
         _symbol = _tokenSymbol;
         _tokenIdTracker.increment();
     }
 
-    modifier onlyOwner() {
-        require(owner == msg.sender, "Ownable: caller is not the owner");
-        _;
-    }
 
     function name() external view returns (string memory) {
         return _name;
@@ -69,26 +46,7 @@ contract OwnUser1155Token is
         return _symbol;
     }
 
-    /** @dev change the Ownership from current owner to newOwner address
-        @param newOwner : newOwner address */
-
-    function transferOwnership(address newOwner)
-        external
-        onlyRole(ADMIN_ROLE)
-        returns (bool)
-    {
-        require(
-            newOwner != address(0),
-            "Ownable: new owner is the zero address"
-        );
-        _revokeRole(ADMIN_ROLE, owner);
-        owner = newOwner;
-        _grantRole(ADMIN_ROLE, newOwner);
-        emit OwnershipTransferred(owner, newOwner);
-        return true;
-    }
-
-    function setBaseURI(string memory uri_) external onlyRole(ADMIN_ROLE) returns (bool) {
+    function setBaseURI(string memory uri_) external onlyOwner returns (bool) {
         emit BaseURIChanged(baseTokenURI, uri_);
         baseTokenURI = uri_;
         return true;
@@ -98,7 +56,7 @@ contract OwnUser1155Token is
         string memory _tokenURI,
         uint96 _royaltyFee,
         uint256 supply
-    ) external virtual onlyRole(ADMIN_ROLE) returns (uint256 _tokenId) {
+    ) external virtual onlyOwner returns (uint256 _tokenId) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
         _tokenId = _tokenIdTracker.current();
@@ -132,9 +90,10 @@ contract OwnUser1155Token is
         }
         return
             bytes(baseTokenURI).length > 0
-                ? string(abi.encodePacked(baseTokenURI, tokenId.toString()))
+                ? string(abi.encodePacked(baseTokenURI, tokenId))
                 : "";
     }
+
 
     /**
      * @dev See {IERC165-supportsInterface}.
@@ -143,20 +102,17 @@ contract OwnUser1155Token is
         public
         view
         virtual
-        override(ERC2981, ERC1155, AccessControl)
+        override(ERC2981, ERC1155)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
     }
 
-    function _beforeTokenTransfer(
-        address _operator,
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) internal virtual override(ERC1155Supply, ERC1155) {
-        super._beforeTokenTransfer(_operator, from, to, ids, amounts, data);
+    // The following functions are overrides required by Solidity.
+    function _update(address from, address to, uint256[] memory ids, uint256[] memory values)
+        internal
+        override(ERC1155, ERC1155Supply)
+    {
+        super._update(from, to, ids, values);
     }
 }
