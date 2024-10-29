@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.21;
 
-import "./ownCollection721.sol";
+import "./Collection721.sol";
 
 contract Factory721 {
     event Deployed(address owner, address contractAddress);
