@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.21;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 import "./interface/ITransferProxy.sol";
 
-contract Trade is AccessControl {
+contract Trade is Ownable {
     enum BuyingAssetType {
         ERC1155,
         ERC721,
@@ -13,10 +14,6 @@ contract Trade is AccessControl {
         LazyERC721
     }
 
-    event OwnershipTransferred(
-        address indexed previousOwner,
-        address indexed newOwner
-    );
     event SellerFee(uint8 sellerFee);
     event BuyerFee(uint8 buyerFee);
     event BuyAsset(
@@ -35,16 +32,12 @@ contract Trade is AccessControl {
     uint8 private buyerFeePermille;
     //seller platformFee
     uint8 private sellerFeePermille;
+
     ITransferProxy public transferProxy;
-    //contract owner
-    address public owner;
 
     address public signer;
 
     mapping(uint256 => bool) private usedNonce;
-
-    // Create a new role identifier for the minter role
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
 
     /** Fee Struct
         @param platformFee  uint256 (buyerFee + sellerFee) value which is transferred to current contract owner.
@@ -99,13 +92,11 @@ contract Trade is AccessControl {
         uint8 _buyerFee,
         uint8 _sellerFee,
         ITransferProxy _transferProxy
-    ) {
+    ) Ownable(msg.sender){
         buyerFeePermille = _buyerFee;
         sellerFeePermille = _sellerFee;
         transferProxy = _transferProxy;
-        owner = msg.sender;
         signer = msg.sender;
-        _grantRole(ADMIN_ROLE, msg.sender);
     }
 
     /**
@@ -130,7 +121,7 @@ contract Trade is AccessControl {
 
     function setBuyerServiceFee(uint8 _buyerFee)
         external
-        onlyRole(ADMIN_ROLE)
+        onlyOwner
         returns (bool)
     {
         buyerFeePermille = _buyerFee;
@@ -144,32 +135,11 @@ contract Trade is AccessControl {
 
     function setSellerServiceFee(uint8 _sellerFee)
         external
-        onlyRole(ADMIN_ROLE)
+        onlyOwner
         returns (bool)
     {
         sellerFeePermille = _sellerFee;
         emit SellerFee(sellerFeePermille);
-        return true;
-    }
-
-    /**
-        transfers the contract ownership to newowner address.    
-        @param newOwner address of newOwner
-     */
-
-    function transferOwnership(address newOwner)
-        external
-        onlyRole(ADMIN_ROLE)
-        returns (bool)
-    {
-        require(
-            newOwner != address(0),
-            "Ownable: new owner is the zero address"
-        );
-        _revokeRole(ADMIN_ROLE, owner);
-        owner = newOwner;
-        _grantRole(ADMIN_ROLE, newOwner);
-        emit OwnershipTransferred(owner, newOwner);
         return true;
     }
 
@@ -481,7 +451,7 @@ contract Trade is AccessControl {
             transferProxy.erc20safeTransferFrom(
                 IERC20(order.erc20Address),
                 buyer,
-                owner,
+                owner(),
                 fee.platformFee
             );
         }

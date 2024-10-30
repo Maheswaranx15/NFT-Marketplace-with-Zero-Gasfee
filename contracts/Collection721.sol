@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./common/ERC2981.sol";
 
-contract sample is
+contract OwnUser721Token is
     ERC721,
     ERC721Enumerable,
     ERC721Burnable,
