@@ -38,11 +38,9 @@ contract LazyMintMultiple is
     constructor(
         string memory _tokenName,
         string memory _tokenSymbol,
-        string memory _baseTokenURI,
-        address _operator
+        string memory _baseTokenURI
     )  ERC1155(_baseTokenURI)Ownable(msg.sender) {
         baseTokenURI = _baseTokenURI;
-        operator = _operator;
         _name = _tokenName;
         _symbol = _tokenSymbol;
         _tokenIdTracker.increment();
