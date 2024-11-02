@@ -2,7 +2,7 @@ const hre = require("hardhat");
 const fs = require("fs");
 async function main() {
 
-    const NFT721name = "ERC721";
+  const NFT721name = "ERC721";
   const NFT721symbol = "NFT721";
   const NFT1155name = "ERC1155";
   const NFT1155symbol = "NFT1155";
