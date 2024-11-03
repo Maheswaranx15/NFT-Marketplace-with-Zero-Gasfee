@@ -9,8 +9,8 @@ async function main() {
   const tokenURIPrefix = "https://gateway.pinata.cloud/ipfs/ "
   const buyerFee = 25;
   const sellerFee = 25;
-  const ERC721 = await hre.ethers.getContractFactory("ERC721");
-  const ERC1155 = await hre.ethers.getContractFactory("ERC1155");
+  const ERC721 = await hre.ethers.getContractFactory("LazyMintSingle");
+  const ERC1155 = await hre.ethers.getContractFactory("LazyMintMultiple");
   const Trade = await hre.ethers.getContractFactory("Trade");
   const Proxy = await hre.ethers.getContractFactory("TransferProxy");
   const Factory721 = await hre.ethers.getContractFactory("Factory721");

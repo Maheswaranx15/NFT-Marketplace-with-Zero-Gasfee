@@ -25,7 +25,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
     localhost: {
       url: "http://127.0.0.1:8545"
     },
-  defaultNetwork: "sepolia",
+  // defaultNetwork: "sepolia",
   networks: {
     hardhat: {
     },
