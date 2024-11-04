@@ -72,9 +72,9 @@ describe("NFT Marketplace", async function () {
       tokenInstance = await Token.deploy(owner.address, "test", "TET");
       await tokenInstance.deployed();
 
-      const Factory721 = await ethers.getContractFactory("Factory721");
-      factory721instance = await Factory721.deploy(buyerFee, sellerFee, proxyinstance.address);
-      await factory721instance.deployed();
+      // const Factory721 = await ethers.getContractFactory("Factory721");
+      // factory721instance = await Factory721.deploy(buyerFee, sellerFee, proxyinstance.address);
+      // await factory721instance.deployed();
 
     //   const Factory1155 = await ethers.getContractFactory("Factory1155");
     //   factory1155instance = await Factory1155.deploy(buyerFee, sellerFee, proxyinstance.address);
@@ -93,4 +93,55 @@ describe("NFT Marketplace", async function () {
       throw error; // Rethrow the error to fail the test case
     }
   });
+
+  it(`setApproval Functionality for erc721`,async()=>{
+    const [owner,user1,user2] = await ethers.getSigners();
+    await nft721instace.connect(user1).setApprovalForAll(proxyinstance.address, true)
+  })
+
+  it(`OwnerSignature`,async()=> {
+    const [owner,user1,user2] = await ethers.getSigners();
+    const uri = "sample1";
+    var tokenhash = ethers.utils.solidityKeccak256(["address", "address", "string", "uint256"], [nft721instace.address, user1.address, uri, nonce_ownersignature]);
+    var arrayify =  ethers.utils.arrayify(tokenhash);
+    var tokensignature = await owner.signMessage(arrayify);
+    var splitSign = ethers.utils.splitSignature(tokensignature)
+    v = splitSign.v
+    r = splitSign.r
+    s = splitSign.s
+  })
+
+  it(`Mint functionality`,async()=>{
+    const [owner,user1,user2] = await ethers.getSigners();
+    const uri = "sample1";
+    const royaltyfee = 5
+    let mint = await nft721instace.connect(user1).mint(uri, royaltyfee, [v,r,s,nonce_ownersignature])
+    let mint_wait = await mint.wait()
+    let from_address = mint_wait.events[0].args[0];
+    let to_address = mint_wait.events[0].args[1];
+    tokenId = mint_wait.events[0].args[2];
+
+  })
+
+  it(`Transfer Function`,async()=>{
+    const [owner,user1,user2] = await ethers.getSigners();
+    let to_address = user2.address
+    let amount = 1025
+    await tokenInstance.connect(owner).transfer(to_address,amount)
+    await tokenInstance.connect(user2).approve(proxyinstance.address,amount)
+  })
+
+  //     it(`Buying Asset by the User`,async()=>{
+  //   const [owner,user1,user2] = await ethers.getSigners();
+  //   let seller = user1.address
+  //   let buyer = user2.address
+  //   let erc20Address = tokenInstance.address
+  //   let nftAddress = nft721instace.address
+  //   let nftType = 0
+  //   let unitPrice = 1000
+  //   let amount = 1025
+  //   let tokenId = 0
+  //   let qty = 1
+  //   await tradeinstance.connect(user2).buyAsset([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,amount,tokenId,qty],[sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature])
+  // })
 });
