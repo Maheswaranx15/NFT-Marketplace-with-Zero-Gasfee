@@ -131,17 +131,18 @@ describe("NFT Marketplace", async function () {
     await tokenInstance.connect(user2).approve(proxyinstance.address,amount)
   })
 
-  //     it(`Buying Asset by the User`,async()=>{
-  //   const [owner,user1,user2] = await ethers.getSigners();
-  //   let seller = user1.address
-  //   let buyer = user2.address
-  //   let erc20Address = tokenInstance.address
-  //   let nftAddress = nft721instace.address
-  //   let nftType = 0
-  //   let unitPrice = 1000
-  //   let amount = 1025
-  //   let tokenId = 0
-  //   let qty = 1
-  //   await tradeinstance.connect(user2).buyAsset([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,amount,tokenId,qty],[sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature])
-  // })
+    it(`Buying Asset by the User`,async()=>{
+    const [owner,user1,user2] = await ethers.getSigners();
+    let seller = user1.address
+    let buyer = user2.address
+    let erc20Address = tokenInstance.address
+    let nftAddress = nft721instace.address
+    let nftType = 1
+    let unitPrice = 1000
+    let amount = 1025
+    let tokenId = 0
+    let qty = 1
+    await tradeinstance.connect(user2).buyAsset([seller,buyer,erc20Address,nftAddress,nftType,true,amount,"12213fibu",1,1,1,1],[sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature])
+  })
+
 });
