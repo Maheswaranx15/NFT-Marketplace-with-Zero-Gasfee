@@ -120,7 +120,7 @@ describe("NFT Marketplace", async function () {
     let from_address = mint_wait.events[0].args[0];
     let to_address = mint_wait.events[0].args[1];
     tokenId = mint_wait.events[0].args[2];
-
+    console.log("TokenId",parseInt(tokenId))
   })
 
   it(`Transfer Function`,async()=>{
@@ -131,7 +131,21 @@ describe("NFT Marketplace", async function () {
     await tokenInstance.connect(user2).approve(proxyinstance.address,amount)
   })
 
-    it(`Buying Asset by the User`,async()=>{
+  it(`Seller sign for buyAsset`,async()=>{
+    const [owner,user1,user2] = await ethers.getSigners();
+    const uri = "sample1";
+    var tokenhash = ethers.utils.solidityKeccak256(["address", "uint256", "address", "uint256", "uint256"], [nft721instace.address, 0, tokenInstance.address, 1025, nonce_sellersignature]);
+    var arrayify =  ethers.utils.arrayify(tokenhash);
+    var tokensignature = await user1.signMessage(arrayify);
+    var splitSign = ethers.utils.splitSignature(tokensignature)
+    sellersign_v = splitSign.v
+    sellersign_r = splitSign.r
+    sellersign_s = splitSign.s
+
+    console.log("signature",sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature)
+  })
+
+  it(`Buying Asset by the User`,async()=>{
     const [owner,user1,user2] = await ethers.getSigners();
     let seller = user1.address
     let buyer = user2.address
@@ -141,8 +155,25 @@ describe("NFT Marketplace", async function () {
     let unitPrice = 1000
     let amount = 1025
     let tokenId = 0
+    let supply = 1
     let qty = 1
-    await tradeinstance.connect(user2).buyAsset([seller,buyer,erc20Address,nftAddress,nftType,true,amount,"12213fibu",1,1,1,1],[sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature])
+
+    // address seller;
+    // address buyer;
+    // address erc20Address;
+    // address nftAddress;
+    // BuyingAssetType nftType;
+    // uint256 unitPrice;
+    // bool skipRoyalty;
+    // uint256 amount;
+    // uint256 tokenId;
+    // string tokenURI;
+    // uint256 supply;
+    // uint96 royaltyFee;
+    // uint256 qty;
+    console.log("checkundefined",seller,buyer,erc20Address,nftAddress,nftType,unitPrice,tokenId,1,unitPrice,"sample1",supply,0,qty)
+    console.log("checksignature",sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature)
+    await tradeinstance.connect(user2).buyAsset([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,tokenId,1,unitPrice,"sample1",supply,0,qty],[sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature])
   })
 
 });
