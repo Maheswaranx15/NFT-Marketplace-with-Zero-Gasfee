@@ -375,7 +375,7 @@ contract Trade is Ownable {
 
     function getFees(
         Order calldata order
-    ) internal view returns (Fee memory) {
+    ) public view returns (Fee memory) {
         address tokenCreator;
         uint256 platformFee;
         uint256 royaltyFee;

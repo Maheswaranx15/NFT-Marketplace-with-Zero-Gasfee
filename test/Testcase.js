@@ -120,7 +120,6 @@ describe("NFT Marketplace", async function () {
     let from_address = mint_wait.events[0].args[0];
     let to_address = mint_wait.events[0].args[1];
     tokenId = mint_wait.events[0].args[2];
-    console.log("TokenId",parseInt(tokenId))
   })
 
   it(`Transfer Function`,async()=>{
@@ -134,7 +133,13 @@ describe("NFT Marketplace", async function () {
   it(`Seller sign for buyAsset`,async()=>{
     const [owner,user1,user2] = await ethers.getSigners();
     const uri = "sample1";
-    var tokenhash = ethers.utils.solidityKeccak256(["address", "uint256", "address", "uint256", "uint256"], [nft721instace.address, 0, tokenInstance.address, 1025, nonce_sellersignature]);
+    let amount = 1025
+    let tokenId = 0;
+    console.log("NFT address",nft721instace.address)
+    console.log("tokenId",tokenId)
+    console.log("token",tokenInstance.address)
+    console.log("nounce amount",amount, nonce_sellersignature)
+    var tokenhash = ethers.utils.solidityKeccak256(["address", "uint256", "address", "uint256", "uint256"], [nft721instace.address, tokenId, tokenInstance.address, amount, nonce_sellersignature]);
     var arrayify =  ethers.utils.arrayify(tokenhash);
     var tokensignature = await user1.signMessage(arrayify);
     var splitSign = ethers.utils.splitSignature(tokensignature)
@@ -142,7 +147,9 @@ describe("NFT Marketplace", async function () {
     sellersign_r = splitSign.r
     sellersign_s = splitSign.s
 
-    console.log("signature",sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature)
+    // console.log("seller sign verification",sellersign_v)
+    // console.log("seller sign verification",sellersign_r)
+    // console.log("seller sign verification",sellersign_s)
   })
 
   it(`Buying Asset by the User`,async()=>{
@@ -171,9 +178,28 @@ describe("NFT Marketplace", async function () {
     // uint256 supply;
     // uint96 royaltyFee;
     // uint256 qty;
-    console.log("checkundefined",seller,buyer,erc20Address,nftAddress,nftType,unitPrice,tokenId,1,unitPrice,"sample1",supply,0,qty)
-    console.log("checksignature",sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature)
-    await tradeinstance.connect(user2).buyAsset([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,tokenId,1,unitPrice,"sample1",supply,0,qty],[sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature])
+
+    // console.log("seller sign verification",sellersign_v)
+    // console.log("seller sign verification",sellersign_r)
+    // console.log("seller sign verification",sellersign_s)
+    // console.log("nonce_sellersignature",nonce_sellersignature)
+
+    // console.log("NFT address",nft721instace.address)
+    // console.log("tokenId",tokenId)
+    // console.log("token",tokenInstance.address)
+    // console.log("nounce amount",amount, nonce_sellersignature)
+    // console.log("ownerof before", await nft721instace.balanceOf(user2.address))
+    let assest = await tradeinstance.getFees([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,0,amount,tokenId,"sample1",supply,5,qty])
+  
+    console.log("asset",parseInt(assest[0]))
+    console.log("asset",parseInt(assest[1]))
+    console.log("asset",parseInt(assest[2]))
+    console.log("asset",parseInt(assest[3]))
+    console.log("asset",(assest[4]))
+
+    // await tradeinstance.connect(user2).buyAsset([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,0,amount,tokenId,"sample1",supply,5,qty],[sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature])
+    // console.log("ownerof after", await nft721instace.balanceOf(user2.address))
+ 
   })
 
 });
