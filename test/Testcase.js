@@ -146,7 +146,6 @@ describe("NFT Marketplace", async function () {
     sellersign_v = splitSign.v
     sellersign_r = splitSign.r
     sellersign_s = splitSign.s
-
     // console.log("seller sign verification",sellersign_v)
     // console.log("seller sign verification",sellersign_r)
     // console.log("seller sign verification",sellersign_s)
@@ -179,16 +178,16 @@ describe("NFT Marketplace", async function () {
     // uint96 royaltyFee;
     // uint256 qty;
 
-    // console.log("seller sign verification",sellersign_v)
-    // console.log("seller sign verification",sellersign_r)
-    // console.log("seller sign verification",sellersign_s)
-    // console.log("nonce_sellersignature",nonce_sellersignature)
+    console.log("seller sign verification",sellersign_v)
+    console.log("seller sign verification",sellersign_r)
+    console.log("seller sign verification",sellersign_s)
+    console.log("nonce_sellersignature",nonce_sellersignature)
 
-    // console.log("NFT address",nft721instace.address)
-    // console.log("tokenId",tokenId)
-    // console.log("token",tokenInstance.address)
-    // console.log("nounce amount",amount, nonce_sellersignature)
-    // console.log("ownerof before", await nft721instace.balanceOf(user2.address))
+    console.log("NFT address",nft721instace.address)
+    console.log("tokenId",tokenId)
+    console.log("token",tokenInstance.address)
+    console.log("nounce amount",amount, nonce_sellersignature)
+    console.log("ownerof before", await nft721instace.balanceOf(user2.address))
     let assest = await tradeinstance.getFees([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,0,amount,tokenId,"sample1",supply,5,qty])
   
     console.log("asset",parseInt(assest[0]))
