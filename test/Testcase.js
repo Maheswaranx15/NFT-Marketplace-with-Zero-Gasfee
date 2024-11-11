@@ -8,9 +8,6 @@ const {
 } = require('@openzeppelin/test-helpers');
 require("@nomiclabs/hardhat-truffle5");
 
-
-
-
 describe("NFT Marketplace", async function () {
   var proxyinstance;
   var nft721instace;
@@ -109,6 +106,7 @@ describe("NFT Marketplace", async function () {
     v = splitSign.v
     r = splitSign.r
     s = splitSign.s
+    
   })
 
   it(`Mint functionality`,async()=>{
@@ -178,16 +176,17 @@ describe("NFT Marketplace", async function () {
     // uint96 royaltyFee;
     // uint256 qty;
 
-    console.log("seller sign verification",sellersign_v)
-    console.log("seller sign verification",sellersign_r)
-    console.log("seller sign verification",sellersign_s)
-    console.log("nonce_sellersignature",nonce_sellersignature)
+    // console.log("seller sign verification",sellersign_v)
+    // console.log("seller sign verification",sellersign_r)
+    // console.log("seller sign verification",sellersign_s)
+    // console.log("nonce_sellersignature",nonce_sellersignature)
 
-    console.log("NFT address",nft721instace.address)
-    console.log("tokenId",tokenId)
-    console.log("token",tokenInstance.address)
-    console.log("nounce amount",amount, nonce_sellersignature)
-    console.log("ownerof before", await nft721instace.balanceOf(user2.address))
+    // console.log("NFT address",nft721instace.address)
+    // console.log("tokenId",tokenId)
+    // console.log("token",tokenInstance.address)
+    // console.log("nounce amount",amount)
+    // console.log("nounce amount",nonce_sellersignature)
+    // console.log("ownerof before", await nft721instace.balanceOf(user2.address))
     let assest = await tradeinstance.getFees([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,0,amount,tokenId,"sample1",supply,5,qty])
   
     console.log("asset",parseInt(assest[0]))
@@ -198,7 +197,9 @@ describe("NFT Marketplace", async function () {
 
     // await tradeinstance.connect(user2).buyAsset([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,0,amount,tokenId,"sample1",supply,5,qty],[sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature])
     // console.log("ownerof after", await nft721instace.balanceOf(user2.address))
- 
+
+    
+
   })
 
 });
