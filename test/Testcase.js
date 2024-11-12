@@ -72,10 +72,9 @@ describe("NFT Marketplace", async function () {
       // const Factory721 = await ethers.getContractFactory("Factory721");
       // factory721instance = await Factory721.deploy(buyerFee, sellerFee, proxyinstance.address);
       // await factory721instance.deployed();
-
-    //   const Factory1155 = await ethers.getContractFactory("Factory1155");
-    //   factory1155instance = await Factory1155.deploy(buyerFee, sellerFee, proxyinstance.address);
-    //   await factory1155instance.deployed();
+      //   const Factory1155 = await ethers.getContractFactory("Factory1155");
+      //   factory1155instance = await Factory1155.deploy(buyerFee, sellerFee, proxyinstance.address);
+      //   await factory1155instance.deployed();
 
       console.log("tokenInstance", tokenInstance.address);
       console.log("proxyinstance", proxyinstance.address);
@@ -210,7 +209,6 @@ describe("NFT Marketplace", async function () {
     v = splitSign.v
     r = splitSign.r
     s = splitSign.s
-    
   })
 
   it(`Mint functionality`,async()=>{
