@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.21;
 
-import "@openzeppelin/contracts/interfaces/IERC20.sol";
-import "@openzeppelin/contracts/interfaces/IERC721.sol";
+import "@openzeppelin/contracts/interfaces/IERC20.sol"; 
+import "@openzeppelin/contracts/interfaces/IERC721.sol"; 
 import "@openzeppelin/contracts/interfaces/IERC1155.sol";
 
 interface ILazyMint {
