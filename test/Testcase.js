@@ -1,11 +1,5 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
-const {
-  BN,           // Big Number support
-  constants,    // Common constants, like the zero address and largest integers
-  expectEvent,  // Assertions for emitted events
-  expectRevert, // Assertions for transactions that should fail
-} = require('@openzeppelin/test-helpers');
 require("@nomiclabs/hardhat-truffle5");
 
 describe("NFT Marketplace", async function () {
@@ -17,24 +11,13 @@ describe("NFT Marketplace", async function () {
   var factory721instance;
   var factory1155instance;
   const nonce_ownersignature = 1; 
-  const nonce_ownersignature_1 = 2;
   const nonce_sellersignature = 3;
-  const nonce_buyersignature_exe = 4;
   const amount = 1000;
   let qty = 1;
   var tokenId;
   var v;
   var r;
   var s;
-  var v1;
-  var s1;
-  var r1;
-  var sellersign_v;
-  var sellersign_r;
-  var sellersign_s;
-  var v_buyer_exec;
-  var r_buyer_exec;
-  var s_buyer_exec;
 
   it("Should deploy contracts and print their addresses", async function () {
     try {
@@ -72,17 +55,16 @@ describe("NFT Marketplace", async function () {
       // const Factory721 = await ethers.getContractFactory("Factory721");
       // factory721instance = await Factory721.deploy(buyerFee, sellerFee, proxyinstance.address);
       // await factory721instance.deployed();
-      //   const Factory1155 = await ethers.getContractFactory("Factory1155");
-      //   factory1155instance = await Factory1155.deploy(buyerFee, sellerFee, proxyinstance.address);
-      //   await factory1155instance.deployed();
+      // const Factory1155 = await ethers.getContractFactory("Factory1155");
+      // factory1155instance = await Factory1155.deploy(buyerFee, sellerFee, proxyinstance.address);
+      // await factory1155instance.deployed();
 
       console.log("tokenInstance", tokenInstance.address);
       console.log("proxyinstance", proxyinstance.address);
       console.log("nft721instace", nft721instace.address);
       console.log("nft1155instance", nft1155instance.address);
       console.log("tradeinstance", tradeinstance.address);
-    //   console.log("factory1155instance", factory1155instance.address);
-    //   console.log("factory721instance", factory721instance.address);
+   
       
     } catch (error) {
       console.error("Error deploying contracts:", error);
@@ -144,9 +126,6 @@ describe("NFT Marketplace", async function () {
     sellersign_v = splitSign.v
     sellersign_r = splitSign.r
     sellersign_s = splitSign.s
-    // console.log("seller sign verification",sellersign_v)
-    // console.log("seller sign verification",sellersign_r)
-    // console.log("seller sign verification",sellersign_s)
   })
 
   it(`Buying Asset by the User`,async()=>{
@@ -161,32 +140,6 @@ describe("NFT Marketplace", async function () {
     let tokenId = 0
     let supply = 1
     let qty = 1
-
-    // address seller;
-    // address buyer;
-    // address erc20Address;
-    // address nftAddress;
-    // BuyingAssetType nftType;
-    // uint256 unitPrice;
-    // bool skipRoyalty;
-    // uint256 amount;
-    // uint256 tokenId;
-    // string tokenURI;
-    // uint256 supply;
-    // uint96 royaltyFee;
-    // uint256 qty;
-
-    // console.log("seller sign verification",sellersign_v)
-    // console.log("seller sign verification",sellersign_r)
-    // console.log("seller sign verification",sellersign_s)
-    // console.log("nonce_sellersignature",nonce_sellersignature)
-
-    // console.log("NFT address",nft721instace.address)
-    // console.log("tokenId",tokenId)
-    // console.log("token",tokenInstance.address)
-    // console.log("nounce amount",amount)
-    // console.log("nounce amount",nonce_sellersignature)
-    // console.log("ownerof before", await nft721instace.balanceOf(user2.address))
     let assest = await tradeinstance.getFees([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,0,amount,tokenId,"sample1",supply,5,qty])
   
     console.log("asset",parseInt(assest[0]))
@@ -196,7 +149,6 @@ describe("NFT Marketplace", async function () {
     console.log("asset",(assest[4]))
 
     // await tradeinstance.connect(user2).buyAsset([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,0,amount,tokenId,"sample1",supply,5,qty],[sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature])
-    // console.log("ownerof after", await nft721instace.balanceOf(user2.address))
   })
 
   it(`OwnerSignature`,async()=> {
