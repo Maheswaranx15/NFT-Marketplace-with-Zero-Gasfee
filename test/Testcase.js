@@ -174,4 +174,14 @@ describe("NFT Marketplace", async function () {
     tokenId = mint_wait.events[0].args[2];
   })
 
+  it(`Mint functionality`,async()=>{
+    const [owner,user1,user2] = await ethers.getSigners();
+    const uri = "sample1";
+    const royaltyfee = 5
+    let mint = await nft721instace.connect(user1).mint(uri, royaltyfee, [v,r,s,6])
+    let mint_wait = await mint.wait()
+    let from_address = mint_wait.events[0].args[0];
+    let to_address = mint_wait.events[0].args[1];
+    tokenId = mint_wait.events[0].args[2];
+  })
 });
