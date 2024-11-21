@@ -140,13 +140,6 @@ describe("NFT Marketplace", async function () {
     let supply = 1
     let qty = 1
     let assest = await tradeinstance.getFees([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,0,amount,tokenId,"sample1",supply,5,qty])
-  
-    // console.log("asset",parseInt(assest[0]))
-    // console.log("asset",parseInt(assest[1]))
-    // console.log("asset",parseInt(assest[2]))
-    // console.log("asset",parseInt(assest[3]))
-    // console.log("asset",(assest[4]))
-
     await tradeinstance.connect(user2).buyAsset([seller,buyer,erc20Address,nftAddress,nftType,unitPrice,0,amount,tokenId,"sample1",supply,5,qty],[sellersign_v,sellersign_r,sellersign_s,nonce_sellersignature])
   })
 
