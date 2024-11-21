@@ -25,7 +25,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
     localhost: {
       url: "http://127.0.0.1:8545"
     },
-  // defaultNetwork: "sepolia",
+  defaultNetwork: "sepolia",
   networks: {
     hardhat: {
     },
@@ -34,7 +34,6 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
       accounts: [process.env.PRIVATE_KEY]
     }
   },
-  
   solidity: {
     version: "0.8.21",
     settings: {
